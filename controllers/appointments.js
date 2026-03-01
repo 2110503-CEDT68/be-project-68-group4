@@ -1,5 +1,6 @@
 const Appointment = require('../models/Appointment');
 const Hospital = require('../models/Hospital');
+const Dentist = require('../models/Dentist');
 
 // @desc      Get all appointments
 // @route     GET /api/v1/appointments
@@ -7,24 +8,20 @@ const Hospital = require('../models/Hospital');
 exports.getAppointments = async (req, res, next) => {
   let query;
 
+  const populateOptions = [
+    { path: 'hospital', select: 'name province tel' },
+    { path: 'dentist', select: 'name yearsOfExperience areaOfExpertise' },
+  ];
+
   // General users can see only their appointments
   if (req.user.role !== 'admin') {
-    query = Appointment.find({ user: req.user.id }).populate({
-      path: 'hospital',
-      select: 'name province tel',
-    });
+    query = Appointment.find({ user: req.user.id }).populate(populateOptions);
   } else {
     // Admin can see all
     if (req.params.hospitalId) {
-      query = Appointment.find({ hospital: req.params.hospitalId }).populate({
-        path: 'hospital',
-        select: 'name province tel',
-      });
+      query = Appointment.find({ hospital: req.params.hospitalId }).populate(populateOptions);
     } else {
-      query = Appointment.find().populate({
-        path: 'hospital',
-        select: 'name province tel',
-      });
+      query = Appointment.find().populate(populateOptions);
     }
   }
 
@@ -49,10 +46,10 @@ exports.getAppointments = async (req, res, next) => {
 // @access    Public
 exports.getAppointment = async (req, res, next) => {
   try {
-    const appointment = await Appointment.findById(req.params.id).populate({
-      path: 'hospital',
-      select: 'name description tel',
-    });
+    const appointment = await Appointment.findById(req.params.id).populate([
+      { path: 'hospital', select: 'name description tel' },
+      { path: 'dentist', select: 'name yearsOfExperience areaOfExpertise' },
+    ]);
 
     if (!appointment) {
       return res.status(404).json({
@@ -89,17 +86,31 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
+    // Validate dentist exists and belongs to this hospital
+    const dentist = await Dentist.findById(req.body.dentist);
+    if (!dentist) {
+      return res.status(404).json({
+        success: false,
+        message: `No dentist with the id of ${req.body.dentist}`,
+      });
+    }
+    if (dentist.hospital.toString() !== req.params.hospitalId) {
+      return res.status(400).json({
+        success: false,
+        message: `Dentist does not belong to hospital ${req.params.hospitalId}`,
+      });
+    }
+
     // Add user Id to req.body
     req.body.user = req.user.id;
 
-    // Check for existed appointment
+    // Check for existed appointment — users can only have 1 booking
     const existedAppointments = await Appointment.find({ user: req.user.id });
 
-    // If the user is not an admin, they can only create 3 appointments
-    if (existedAppointments.length >= 3 && req.user.role !== 'admin') {
+    if (existedAppointments.length >= 1 && req.user.role !== 'admin') {
       return res.status(400).json({
         success: false,
-        message: `The user with ID ${req.user.id} has already made 3 appointments`,
+        message: `The user with ID ${req.user.id} has already made a booking. Only 1 booking is allowed per user.`,
       });
     }
 

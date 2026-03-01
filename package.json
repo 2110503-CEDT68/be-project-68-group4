@@ -1,7 +1,7 @@
 {
-  "name": "vacq",
+  "name": "dentist-booking",
   "version": "1.0.0",
-  "description": "Vaccine Queue Management API",
+  "description": "Dentist Booking REST API",
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node server",

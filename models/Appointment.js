@@ -15,6 +15,11 @@ const AppointmentSchema = new mongoose.Schema({
     ref: 'Hospital',
     required: true,
   },
+  dentist: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Dentist',
+    required: [true, 'Please select a dentist'],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

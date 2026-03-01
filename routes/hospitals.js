@@ -9,6 +9,7 @@ const {
 
 // Include other resource routers
 const appointmentRouter = require('./appointments');
+const dentistRouter = require('./dentists');
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 // Re-route into other resource routers
 router.use('/:hospitalId/appointments', appointmentRouter);
+router.use('/:hospitalId/dentists', dentistRouter);
 
 router
   .route('/')

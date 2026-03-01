@@ -5,20 +5,20 @@ const User = require('../models/User');
 // @access    Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role, tel } = req.body;
+    const { name, email, password, tel } = req.body;
 
-    // Create user
+    // Create user — role is always 'user' on self-registration
     const user = await User.create({
       name,
       email,
       password,
-      role,
       tel,
+      role: 'user',
     });
 
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    res.status(400).json({ success: false });
+    res.status(400).json({ success: false, message: err.message });
     console.log(err.stack);
   }
 };

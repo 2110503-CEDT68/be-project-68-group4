@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const colors = require('colors');
 const Hospital = require('./models/Hospital');
+const Dentist = require('./models/Dentist');
+const Appointment = require('./models/Appointment');
 
 // Load env vars
 dotenv.config({ path: './config/config.env' });
@@ -53,7 +55,9 @@ const seedHospitals = async () => {
       }
     }
     
-    // Delete existing hospitals
+    // Delete existing hospitals, dentists, and appointments (they reference hospitals)
+    await Appointment.deleteMany({});
+    await Dentist.deleteMany({});
     await Hospital.deleteMany({});
     console.log('Deleted existing hospitals'.red.inverse);
     
