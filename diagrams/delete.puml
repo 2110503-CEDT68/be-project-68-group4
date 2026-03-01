@@ -1,0 +1,14 @@
+@startuml
+actor Client
+participant "Express Router" as Router
+participant "Hospital Controller" as Controller
+database "Data Store" as DB
+
+Client -> Router: DELETE /api/v1/hospitals/:id
+Router -> Controller: deleteHospital(id)
+Controller -> DB: findByIdAndDelete(id)
+DB --> Controller: success
+Controller --> Router: 200 OK {success, data: {}}
+Router --> Client: JSON Response
+
+@enduml

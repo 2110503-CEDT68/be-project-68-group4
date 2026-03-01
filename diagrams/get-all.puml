@@ -1,0 +1,14 @@
+@startuml
+actor Client
+participant "Express Router" as Router
+participant "Hospital Controller" as Controller
+database "Data Store" as DB
+
+Client -> Router: GET /api/v1/hospitals
+Router -> Controller: getHospitals()
+Controller -> DB: findAll()
+DB --> Controller: hospitals[]
+Controller --> Router: 200 OK {success, data}
+Router --> Client: JSON Response
+
+@enduml
