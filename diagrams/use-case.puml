@@ -1,0 +1,33 @@
+@startuml
+title Hospital Management API - Use Case Diagram
+
+skinparam actor {
+  BackgroundColor #E8F4FD
+  BorderColor #1976D2
+  FontColor #0D47A1
+}
+
+left to right direction
+
+actor "Client" as Client <<Front-End>>
+
+rectangle "Hospital Management API" {
+  usecase "View all hospitals" as UC_GetAll
+  usecase "View hospital details" as UC_GetOne
+  usecase "Create hospital" as UC_Create
+  usecase "Update hospital" as UC_Update
+  usecase "Delete hospital" as UC_Delete
+}
+
+Client --> UC_GetAll
+Client --> UC_GetOne
+Client --> UC_Create
+Client --> UC_Update
+Client --> UC_Delete
+
+note right of Client
+  Could be web app,
+  mobile app, or API client
+end note
+
+@enduml
