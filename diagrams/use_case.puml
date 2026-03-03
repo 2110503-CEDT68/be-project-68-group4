@@ -1,0 +1,88 @@
+@startuml Use Case Diagram - Dentist Booking System
+
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+skinparam usecase {
+  BackgroundColor #FEFECE
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+
+actor "Guest" as Guest
+actor "User" as User
+actor "Admin" as Admin
+
+rectangle "Authentication" {
+  usecase "Register" as UC_Register
+  usecase "Login" as UC_Login
+  usecase "Logout" as UC_Logout
+  usecase "View Profile\n(Get Me)" as UC_GetMe
+}
+
+rectangle "Hospital Management" {
+  usecase "View All Hospitals" as UC_GetHospitals
+  usecase "View Hospital Detail" as UC_GetHospital
+  usecase "Create Hospital" as UC_CreateHospital
+  usecase "Update Hospital" as UC_UpdateHospital
+  usecase "Delete Hospital" as UC_DeleteHospital
+}
+
+rectangle "Dentist Management" {
+  usecase "View All Dentists" as UC_GetDentists
+  usecase "View Dentist Detail" as UC_GetDentist
+  usecase "Create Dentist" as UC_CreateDentist
+  usecase "Update Dentist" as UC_UpdateDentist
+  usecase "Delete Dentist" as UC_DeleteDentist
+}
+
+rectangle "Appointment Management" {
+  usecase "Create Appointment\n(max 1 per user)" as UC_AddAppointment
+  usecase "View Own Appointments" as UC_GetOwnAppointments
+  usecase "View All Appointments" as UC_GetAllAppointments
+  usecase "Update Own Appointment" as UC_UpdateOwnAppointment
+  usecase "Update Any Appointment" as UC_UpdateAnyAppointment
+  usecase "Delete Own Appointment" as UC_DeleteOwnAppointment
+  usecase "Delete Any Appointment" as UC_DeleteAnyAppointment
+}
+
+' Guest connections
+Guest --> UC_Register
+Guest --> UC_Login
+Guest --> UC_GetHospitals
+Guest --> UC_GetHospital
+Guest --> UC_GetDentists
+Guest --> UC_GetDentist
+
+' User connections
+User --> UC_Logout
+User --> UC_GetMe
+User --> UC_GetHospitals
+User --> UC_GetHospital
+User --> UC_GetDentists
+User --> UC_GetDentist
+User --> UC_AddAppointment
+User --> UC_GetOwnAppointments
+User --> UC_UpdateOwnAppointment
+User --> UC_DeleteOwnAppointment
+
+' Admin connections
+Admin --> UC_Logout
+Admin --> UC_GetMe
+Admin --> UC_GetHospitals
+Admin --> UC_GetHospital
+Admin --> UC_CreateHospital
+Admin --> UC_UpdateHospital
+Admin --> UC_DeleteHospital
+Admin --> UC_GetDentists
+Admin --> UC_GetDentist
+Admin --> UC_CreateDentist
+Admin --> UC_UpdateDentist
+Admin --> UC_DeleteDentist
+Admin --> UC_AddAppointment
+Admin --> UC_GetAllAppointments
+Admin --> UC_UpdateAnyAppointment
+Admin --> UC_DeleteAnyAppointment
+
+@enduml
