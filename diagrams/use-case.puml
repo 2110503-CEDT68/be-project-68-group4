@@ -12,11 +12,13 @@ skinparam rectangle<<Client>> {
 rectangle "Client" as Client <<Client>>
 
 rectangle "Hospital Management API" {
-  usecase "View all hospitals" as UC_GetAll
-  usecase "View hospital details" as UC_GetOne
-  usecase "Create hospital" as UC_Create
-  usecase "Update hospital" as UC_Update
-  usecase "Delete hospital" as UC_Delete
+  together {
+    usecase "View all hospitals" as UC_GetAll
+    usecase "View hospital details" as UC_GetOne
+    usecase "Create hospital" as UC_Create
+    usecase "Update hospital" as UC_Update
+    usecase "Delete hospital" as UC_Delete
+  }
 }
 
 Client --> UC_GetAll
@@ -24,6 +26,12 @@ Client --> UC_GetOne
 Client --> UC_Create
 Client --> UC_Update
 Client --> UC_Delete
+
+' hidden links to force horizontal alignment of use cases
+UC_GetAll -[hidden]-> UC_GetOne
+UC_GetOne -[hidden]-> UC_Create
+UC_Create -[hidden]-> UC_Update
+UC_Update -[hidden]-> UC_Delete
 
 note right of Client
   Could be web app,
