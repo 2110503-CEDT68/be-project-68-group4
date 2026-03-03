@@ -1,0 +1,67 @@
+@startuml Class Diagram - Dentist Booking System
+
+skinparam class {
+  BackgroundColor #FEFECE
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+
+skinparam classAttributeIconSize 0
+
+class User {
+  + name : String <<required>>
+  + email : String <<required, unique>>
+  + tel : String <<required, match: /^[0-9]{9,10}$/>>
+  + role : String <<enum: [user, admin], default: user>>
+  - password : String <<required, minlength: 6, select: false>>
+  + resetPasswordToken : String
+  + resetPasswordExpire : Date
+  + createdAt : Date <<default: Date.now>>
+  __
+  **Pre-save Middleware**
+  .. Encrypt password using bcrypt ..
+  __
+  **Methods**
+  + getSignedJwtToken() : String
+  + matchPassword(enteredPassword: String) : Boolean
+}
+
+class Hospital {
+  + name : String <<required, unique, trim, maxlength: 100>>
+  + address : String <<required>>
+  + district : String <<required>>
+  + province : String <<required>>
+  + postalcode : String <<required, maxlength: 5>>
+  + tel : String
+  + region : String <<required>>
+  __
+  **Virtual Fields**
+  + appointments : Appointment[] <<reverse populate>>
+  __
+  **Pre-deleteOne Middleware**
+  .. Cascade delete all appointments ..
+}
+
+class Dentist {
+  + name : String <<required, trim, maxlength: 100>>
+  + yearsOfExperience : Number <<required, min: 0>>
+  + areaOfExpertise : String <<required, trim>>
+  + hospital : ObjectId <<ref: Hospital, required>>
+}
+
+class Appointment {
+  + apptDate : Date <<required>>
+  + user : ObjectId <<ref: User, required>>
+  + hospital : ObjectId <<ref: Hospital, required>>
+  + dentist : ObjectId <<ref: Dentist, required>>
+  + createdAt : Date <<default: Date.now>>
+}
+
+' --- Relationships ---
+
+User "1" -- "0..1" Appointment : "creates >\n(users limited to 1 appointment)"
+Hospital "1" -- "0..*" Appointment : "has >\n(cascade delete)"
+Hospital "1" -- "0..*" Dentist : "employs >"
+Dentist "1" -- "0..*" Appointment : "assigned to >"
+
+@enduml

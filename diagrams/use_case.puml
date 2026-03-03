@@ -1,0 +1,65 @@
+@startuml
+left to right direction
+
+actor Guest
+actor User
+actor Admin
+
+User --|> Guest
+Admin --|> User
+
+rectangle "Dentist Booking System" {
+
+  package "Authentication" {
+    usecase "Register"
+    usecase "Login"
+    usecase "Logout"
+    usecase "View Profile"
+  }
+
+  package "Appointment" {
+    usecase "Create Booking"
+    usecase "View Own Booking"
+    usecase "Update Own Booking"
+    usecase "Delete Own Booking"
+    usecase "View All Bookings"
+    usecase "Update Any Booking"
+    usecase "Delete Any Booking"
+  }
+
+  package "Hospital Management" {
+    usecase "Create Hospital"
+    usecase "Update Hospital"
+    usecase "Delete Hospital"
+    usecase "View Hospital"
+  }
+
+  package "Dentist Management" {
+    usecase "Create Dentist"
+    usecase "Update Dentist"
+    usecase "Delete Dentist"
+    usecase "View Dentist"
+  }
+}
+
+Guest --> (Register)
+Guest --> (Login)
+
+User --> (Create Booking)
+User --> (View Own Booking)
+User --> (Update Own Booking)
+User --> (Delete Own Booking)
+User --> (View Profile)
+User --> (Logout)
+
+Admin --> (View All Bookings)
+Admin --> (Update Any Booking)
+Admin --> (Delete Any Booking)
+Admin --> (Create Hospital)
+Admin --> (Update Hospital)
+Admin --> (Delete Hospital)
+Admin --> (Create Dentist)
+Admin --> (Update Dentist)
+Admin --> (Delete Dentist)
+
+@enduml

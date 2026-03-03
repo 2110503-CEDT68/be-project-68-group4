@@ -1,0 +1,62 @@
+@startuml Sequence Diagram - Register
+
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+
+actor "Guest" as Guest
+participant "<<routes>>\nauth.js" as Routes
+participant "<<controllers>>\nauth.js" as Controller
+participant "<<models>>\nUser.js" as UserModel
+database "MongoDB" as DB
+
+title Register User
+
+Guest -> Routes : POST /api/v1/auth/register\n{name, email, password, tel}
+activate Routes
+
+Routes -> Controller : register(req, res, next)
+activate Controller
+
+Controller -> UserModel : User.create({name, email,\npassword, tel, role: 'user'})
+activate UserModel
+
+note right of UserModel
+  **Pre-save Middleware:**
+  1. Generate salt (bcrypt.genSalt(10))
+  2. Hash password (bcrypt.hash)
+end note
+
+UserModel -> DB : Insert User document\n(with hashed password)
+activate DB
+DB --> UserModel : User document
+deactivate DB
+
+UserModel --> Controller : user
+deactivate UserModel
+
+Controller -> UserModel : user.getSignedJwtToken()
+activate UserModel
+
+note right of UserModel
+  **jwt.sign({id: this._id},**
+  **JWT_SECRET,**
+  **{expiresIn: JWT_EXPIRE})**
+end note
+
+UserModel --> Controller : token
+deactivate UserModel
+
+Controller -> Controller : sendTokenResponse(user, 200, res)
+
+note right of Controller
+  Set cookie options:
+  - expires: JWT_COOKIE_EXPIRE days
+  - httpOnly: true
+  - secure: true (production only)
+end note
+
+Controller --> Guest : 200 OK\n{ success: true, token }\n+ Set-Cookie: token (httpOnly)
+deactivate Controller
+deactivate Routes
+
+@enduml
