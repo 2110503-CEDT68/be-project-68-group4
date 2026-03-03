@@ -1,15 +1,15 @@
 @startuml
 title Hospital Management API - Use Case Diagram
 
-skinparam actor {
+left to right direction
+
+skinparam rectangle<<Client>> {
   BackgroundColor #E8F4FD
   BorderColor #1976D2
   FontColor #0D47A1
 }
 
-left to right direction
-
-actor "Client" as Client <<Front-End>>
+rectangle "Client" as Client <<Client>>
 
 rectangle "Hospital Management API" {
   usecase "View all hospitals" as UC_GetAll
