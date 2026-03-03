@@ -1,0 +1,64 @@
+@startuml Sequence Diagram - Login
+
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+
+actor "User/Admin" as User
+participant "<<routes>>\nauth.js" as Routes
+participant "<<controllers>>\nauth.js" as Controller
+participant "<<models>>\nUser.js" as UserModel
+database "MongoDB" as DB
+
+title Login User
+
+User -> Routes : POST /api/v1/auth/login\n{email, password}
+activate Routes
+
+Routes -> Controller : login(req, res, next)
+activate Controller
+
+alt email or password missing
+  Controller --> User : 400 Bad Request\n{success: false,\nmsg: "Please provide an email and password"}
+else credentials provided
+  Controller -> UserModel : User.findOne({email})\n.select('+password')
+  activate UserModel
+  UserModel -> DB : Find user by email\n(include password field)
+  activate DB
+  DB --> UserModel : User document (with password)
+  deactivate DB
+  UserModel --> Controller : user
+  deactivate UserModel
+
+  alt user not found
+    Controller --> User : 400 Bad Request\n{success: false, msg: "Invalid credentials"}
+  else user found
+    Controller -> UserModel : user.matchPassword(enteredPassword)
+    activate UserModel
+
+    note right of UserModel
+      **bcrypt.compare(**
+      **enteredPassword,**
+      **this.password)**
+    end note
+
+    UserModel --> Controller : isMatch (true/false)
+    deactivate UserModel
+
+    alt password does not match
+      Controller --> User : 401 Unauthorized\n{success: false, msg: "Invalid credentials"}
+    else password matches
+      Controller -> UserModel : user.getSignedJwtToken()
+      activate UserModel
+      UserModel --> Controller : token
+      deactivate UserModel
+
+      Controller -> Controller : sendTokenResponse(user, 200, res)
+      Controller --> User : 200 OK\n{ success: true, token }\n+ Set-Cookie: token (httpOnly)
+    end
+  end
+end
+
+deactivate Controller
+deactivate Routes
+
+@enduml
